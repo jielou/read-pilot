@@ -1,0 +1,414 @@
+{
+  "schema_version": "1.0",
+  "source_url": "https://mitchellh.com/writing/my-ai-adoption-journey",
+  "slug": "my-ai-adoption-journey",
+  "title": "My AI Adoption Journey",
+  "subtitle": "A guided companion for reading Mitchell Hashimoto's measured account of moving from AI skepticism to agent-based workflows.",
+  "author": "Mitchell Hashimoto",
+  "published": "February 5, 2026",
+  "captured_at": "2026-06-19T16:52:07.401931+00:00",
+  "language": "en",
+  "summary": {
+    "one_sentence": "这篇文章的核心观点是：AI 工具真正变有用，不是从 chatbot 里得到一次惊艳回答开始，而是经过笨拙试用、复现训练、任务筛选和 harness 工程之后，逐步融入真实工作流。",
+    "high_level": "Mitchell Hashimoto 以自己的采用路径为主线，讲他如何从怀疑 AI，到发现 agent 比 chatbot 更适合编码，再到用“复现自己已完成工作”的方式训练判断力。他随后把 agent 放到每天结束前和后台低风险任务中，用它们做研究、triage、确定性修复等工作。文章后半段把重点转到 harness engineering：当 agent 犯错时，不只是纠正这一次，而是改进提示、AGENTS.md、脚本和验证工具，让同类错误以后更少发生。结尾的态度很克制：他不把 AI 当信仰或身份，只把它当成一个需要持续校准的工匠工具。",
+    "takeaways": [
+      "作者反复强调 AI 采用有学习曲线：先低效，再够用，最后才可能改造工作流。",
+      "编码场景里，纯 chatbot 的摩擦太高；能读文件、跑命令、请求网络的 agent 才更接近真实生产力工具。",
+      "训练自己使用 agent 的有效方法，是让 agent 复现你已经亲手完成的工作，从失败里提炼边界和操作原则。",
+      "不要把 agent 用在所有事上；知道什么时候不用 agent，本身就是效率来源。",
+      "真正的杠杆来自 harness engineering：把每次 agent 失败转成可复用的提示、脚本、测试或工作流改进。"
+    ]
+  },
+  "structure_map": [
+    {
+      "label": "Mindset",
+      "sections": [
+        "introduction"
+      ],
+      "description": "先说明作者采用新工具的一般规律：必须穿过低效期和够用期，才可能看到工作流改变。"
+    },
+    {
+      "label": "Agent Basics",
+      "sections": [
+        "step-1-drop-the-chatbot",
+        "step-2-reproduce-your-own-work"
+      ],
+      "description": "把 chatbot 和 agent 区分开，并解释作者如何通过复现自己的提交来建立 agent 使用能力。"
+    },
+    {
+      "label": "Workflow Integration",
+      "sections": [
+        "step-3-end-of-day-agents",
+        "step-4-outsource-the-slam-dunks",
+        "step-6-always-have-an-agent-running"
+      ],
+      "description": "展示 agent 如何从实验工具变成日常后台工作流：睡前启动、筛选确定性任务、保持低干扰运行。"
+    },
+    {
+      "label": "Harness Engineering",
+      "sections": [
+        "step-5-engineer-the-harness"
+      ],
+      "description": "把一次次失败沉淀为 AGENTS.md、脚本、截图、测试和验证工具，从而提高下一次 agent 成功率。"
+    },
+    {
+      "label": "Caveats",
+      "sections": [
+        "today",
+        "footnotes"
+      ],
+      "description": "收束文章立场：作者认可自己的收益，但保持不劝服别人、不押注行业叙事的态度。"
+    }
+  ],
+  "glossary": [
+    {
+      "term": "chatbot",
+      "translation": "聊天机器人界面",
+      "explanation": "这里指主要靠问答和复制粘贴来完成工作的 AI 界面。作者认为它有用，但在编码工作中摩擦大、反馈环慢。"
+    },
+    {
+      "term": "agent",
+      "translation": "智能体 / agent",
+      "explanation": "能在对话之外调用工具并循环行动的 LLM。本文最低要求是能读文件、执行程序、发 HTTP 请求。"
+    },
+    {
+      "term": "brownfield project",
+      "translation": "既有项目",
+      "explanation": "已有大量代码、历史约束和局部惯例的项目。作者发现 chatbot 在这类项目中容易给出脱离上下文的结果。"
+    },
+    {
+      "term": "agentic",
+      "translation": "agent 式的 / 由 agent 执行的",
+      "explanation": "指让模型通过工具和环境完成任务，而不是只生成一段静态答案。作者用 agentic commits 来训练自己。"
+    },
+    {
+      "term": "warm start",
+      "translation": "热启动",
+      "explanation": "第二天开始工作时已经有研究结果、候选方案或 triage 报告，减少重新进入状态的成本。"
+    },
+    {
+      "term": "slam dunk",
+      "translation": "高确定性任务",
+      "explanation": "作者用这个词指自己很确信 agent 能完成得不错的任务。关键不是任务小，而是成功概率高、验收清楚。"
+    },
+    {
+      "term": "context switching",
+      "translation": "上下文切换",
+      "explanation": "人在深度工作时被通知或状态变化打断，需要额外成本恢复思路。作者因此建议关闭 agent 桌面通知。"
+    },
+    {
+      "term": "harness engineering",
+      "translation": "运行框架工程 / harness 工程",
+      "explanation": "作者给自己实践起的名字：通过提示、项目说明、脚本、测试和截图等外部机制，让 agent 更容易发现并修正错误。"
+    },
+    {
+      "term": "AGENTS.md",
+      "translation": "agent 项目说明文件",
+      "explanation": "放在代码库中给 agent 读取的约定文件，通常记录命令、项目结构、常见坑和工作规范。"
+    },
+    {
+      "term": "skill formation",
+      "translation": "技能形成",
+      "explanation": "指人在亲自完成任务过程中积累能力。作者承认把任务交给 agent 会影响某些技能形成，但认为可以有意识地选择哪些任务继续手工做。"
+    }
+  ],
+  "sections": [
+    {
+      "id": "introduction",
+      "level": 2,
+      "title": "Introduction",
+      "summary_zh": "开头先给出作者采用新工具的通用模型：一开始必然低效，然后达到够用，最后才可能发现改变工作方式的新用法。作者把这篇文章定位为个人路径记录，而不是 AI 布道文，也特意说明文章由自己手写。",
+      "key_points": [
+        "作者承认自己原本已经有满意的工作流，因此采用新工具本身有成本。",
+        "这篇文章不是为了证明 AI 必然伟大，而是说明他如何在现实摩擦中找到价值。",
+        "三阶段模型很重要：如果只看第一阶段的低效，很容易过早放弃；如果跳过第二阶段，又容易被 hype 带偏。"
+      ],
+      "why_it_matters": "这一节设置了全文的语气：作者不是从概念上支持或反对 AI，而是把它当成一项需要通过实践校准的新工具。",
+      "review_questions": [
+        "作者说采用有意义工具通常会经过哪三个阶段？",
+        "为什么作者强调这篇文章是自己的手写文字？",
+        "这篇文章的目标是说服别人使用 AI，还是解释一条个人采用路径？"
+      ],
+      "blocks": [
+        {
+          "id": "intro-focus-1",
+          "type": "paragraph",
+          "text": "阅读重点：把这篇文章当成“工具采用案例”，而不是单纯的 AI 观点文章。",
+          "note_zh": "作者最关心的是工作流如何变化：他不是在讨论模型排行榜，而是在讨论自己怎样从低效用法走到可持续用法。",
+          "translation_zh": ""
+        },
+        {
+          "id": "intro-focus-2",
+          "type": "paragraph",
+          "text": "结构提示：后面的六个 step 不是教程式 checklist，而是作者逐步降低摩擦、提高成功率的学习过程。",
+          "note_zh": "读的时候可以留意每一步解决的是上一阶段的哪个痛点。",
+          "translation_zh": ""
+        }
+      ]
+    },
+    {
+      "id": "step-1-drop-the-chatbot",
+      "level": 2,
+      "title": "Step 1: Drop the Chatbot",
+      "summary_zh": "第一步是停止把 chatbot 当成主要编码工作界面。作者承认聊天界面有价值，也举了早期视觉到代码的惊艳体验，但在既有项目里，复制粘贴代码和命令输出、不断人工纠错，让效率很快变差。因此他提出：要在编码里找到真正价值，必须使用 agent。",
+      "key_points": [
+        "chatbot 的问题不是完全没用，而是它和真实代码库之间隔了一层人工搬运。",
+        "一次惊艳 demo 不代表能稳定适用于日常 brownfield 工作。",
+        "agent 的关键区别是能在环境里行动：读文件、跑程序、请求网络，并根据结果继续下一步。"
+      ],
+      "why_it_matters": "这节建立了全文最基础的界面选择：如果工具不能进入真实工作环境，就很难形成持续生产力。",
+      "review_questions": [
+        "作者为什么认为 chatbot 在编码中的效用有限？",
+        "他早期的“oh wow”体验为什么没有直接变成稳定生产力？",
+        "本文对 agent 的最低能力要求是什么？"
+      ],
+      "blocks": [
+        {
+          "id": "chatbot-focus-1",
+          "type": "paragraph",
+          "text": "阅读重点：作者不是否定聊天界面，而是指出它作为主要编码界面的反馈环太慢。",
+          "note_zh": "如果你需要反复把代码、报错、命令输出搬进搬出界面，人的手工协调成本会吞掉模型带来的收益。",
+          "translation_zh": ""
+        },
+        {
+          "id": "chatbot-focus-2",
+          "type": "paragraph",
+          "text": "术语提示：brownfield projects 指已有代码库，不是从零开始的小 demo。",
+          "note_zh": "在既有项目里，局部约定、依赖关系和历史设计都很重要。agent 能直接读项目，才有机会处理这些上下文。",
+          "translation_zh": ""
+        }
+      ]
+    },
+    {
+      "id": "step-2-reproduce-your-own-work",
+      "level": 2,
+      "title": "Step 2: Reproduce Your Own Work",
+      "summary_zh": "作者尝试 Claude Code 后一开始并不满意，于是用一个很笨但有效的方法训练自己：先手工完成工作，再让 agent 在看不到手工答案的情况下复现同等质量和功能。这个过程很痛苦，但让他从第一性原理上学会了任务拆分、规划和执行分离、给 agent 验证手段，以及判断哪些任务不该交给 agent。",
+      "key_points": [
+        "复现自己的工作是一种高质量对照实验：你知道正确结果，因此能准确评估 agent 差在哪里。",
+        "作者得出的原则很工程化：任务要清晰、模糊需求先规划、必须提供验证路径。",
+        "效率提升的一部分来自负空间：知道什么时候不要用 agent。",
+        "这一阶段让 agent 从“拖慢我”变成“至少不比我慢”，但还没有显著净效率收益。"
+      ],
+      "why_it_matters": "这节是全文最可操作的学习方法。它说明想用好 agent，关键不是多看教程，而是建立自己的失败样本和判断边界。",
+      "review_questions": [
+        "为什么“先手工做一遍，再让 agent 复现”能帮助学习？",
+        "作者从这个阶段总结出哪三条具体原则？",
+        "为什么知道何时不用 agent 也是效率来源？"
+      ],
+      "blocks": [
+        {
+          "id": "reproduce-focus-1",
+          "type": "paragraph",
+          "text": "阅读重点：这一步的目标不是节省当下时间，而是训练判断力。",
+          "note_zh": "作者故意把同一件事做两遍，是为了把 agent 的失败模式暴露出来，并把它们转成之后的操作规则。",
+          "translation_zh": ""
+        },
+        {
+          "id": "reproduce-focus-2",
+          "type": "paragraph",
+          "text": "难点提示：negative space 指“没有做什么”的空间，也就是不用 agent 的边界。",
+          "note_zh": "成熟用法不等于把所有任务都交给 agent，而是能快速识别哪些任务交出去大概率浪费时间。",
+          "translation_zh": ""
+        }
+      ]
+    },
+    {
+      "id": "step-3-end-of-day-agents",
+      "level": 2,
+      "title": "Step 3: End-of-Day Agents",
+      "summary_zh": "为了找到更多效率，作者开始在每天最后半小时启动一个或多个 agent，让它们在自己无法高效工作的时间里推进任务。最有帮助的类别包括深度研究、并行探索模糊想法、issue 和 PR triage/review。重点不是让 agent 整夜循环，而是让第二天有一个 warm start。",
+      "key_points": [
+        "这个策略把 agent 放到人的低效率时段，而不是强行替代高质量深度工作时间。",
+        "适合 end-of-day agent 的任务通常有探索性、整理性或筛选性，不一定要求直接可合并产出。",
+        "第二天的收益是启动成本降低：已经有报告、候选方向或优先级线索。",
+        "作者的实践很克制：多数任务半小时内结束，并没有追求无人值守整夜运行。"
+      ],
+      "why_it_matters": "这节把 agent 的价值从“更快写代码”扩展到“改善第二天的工作入口”。这是一种更贴近个人节奏的生产力设计。",
+      "review_questions": [
+        "作者为什么选择每天最后半小时启动 agent？",
+        "哪些任务类型适合作为 end-of-day agents？",
+        "warm start 对第二天的工作有什么帮助？"
+      ],
+      "blocks": [
+        {
+          "id": "eod-focus-1",
+          "type": "paragraph",
+          "text": "阅读重点：作者不是在追求 agent 绝对自动化，而是在重新安排人和 agent 的时间分工。",
+          "note_zh": "当人已经疲惫、难以进入深度状态时，把整理、研究、筛选类任务交给 agent，第二天再由人判断和接手。",
+          "translation_zh": ""
+        },
+        {
+          "id": "eod-focus-2",
+          "type": "paragraph",
+          "text": "实践提示：triage/report 类任务的价值在于辅助决策，不一定直接提交代码。",
+          "note_zh": "这能降低风险：agent 可以先帮你看信息、排优先级、找低成本机会，人再决定是否行动。",
+          "translation_zh": ""
+        }
+      ]
+    },
+    {
+      "id": "step-4-outsource-the-slam-dunks",
+      "level": 2,
+      "title": "Step 4: Outsource the Slam Dunks",
+      "summary_zh": "到这一阶段，作者已经能判断哪些任务 agent 很可能做对，于是开始把这些高确定性任务交给 agent 后台执行，自己继续做更想做或必须亲自做的深度工作。关键操作之一是关闭 agent 桌面通知，让人控制何时检查 agent，而不是被 agent 打断。",
+      "key_points": [
+        "高确定性任务来自前一晚的 triage 结果，由人筛选后再交给 agent。",
+        "作者强调自己不是用 agent 释放时间去娱乐，而是在并行做其他真实工作。",
+        "关闭通知是为了保护深度工作的连续性，避免 agent 变成新的干扰源。",
+        "关于技能形成，作者的取舍是：被委派任务的技能可能少练，但自己手工做的任务仍会继续积累能力。"
+      ],
+      "why_it_matters": "这节是作者从“agent 不拖慢我”进入“agent 能提高整体吞吐”的关键转折：人负责判断、筛选和深度工作，agent 负责确定性执行。",
+      "review_questions": [
+        "什么样的任务可以算作者语境里的 slam dunk？",
+        "为什么 agent 通知会伤害效率？",
+        "作者怎样回应技能形成方面的担忧？"
+      ],
+      "blocks": [
+        {
+          "id": "slam-focus-1",
+          "type": "paragraph",
+          "text": "阅读重点：真正的效率来自任务筛选，而不是盲目并行。",
+          "note_zh": "作者先手工过滤 issue，再把大概率成功的任务交给 agent。这说明人的判断仍然是工作流核心。",
+          "translation_zh": ""
+        },
+        {
+          "id": "slam-focus-2",
+          "type": "paragraph",
+          "text": "实践提示：关闭通知不是小细节，而是人机协作的控制权设计。",
+          "note_zh": "如果 agent 随时打断你，它就会把后台生产力变成前台上下文切换成本。",
+          "translation_zh": ""
+        }
+      ]
+    },
+    {
+      "id": "step-5-engineer-the-harness",
+      "level": 2,
+      "title": "Step 5: Engineer the Harness",
+      "summary_zh": "这一节提出文章里最重要的工程概念：harness engineering。当 agent 犯错时，作者不只修正当前输出，而是把错误转成系统性改进，比如更新 AGENTS.md、加入脚本、截图工具、筛选测试等，让 agent 下次能更快发现自己错了或确认自己做对了。",
+      "key_points": [
+        "提高 agent 产出质量的核心，是给它快速、可靠的自动反馈。",
+        "简单问题可以通过 AGENTS.md 这类隐式提示解决，例如记录正确命令或常用 API。",
+        "复杂问题需要真实工具：截图、过滤测试、验证脚本等。",
+        "每次错误都可以变成一次 harness 改进，而不是只靠人工提醒。"
+      ],
+      "why_it_matters": "这节把作者的实践从个人技巧提升到工程系统。可复用的 harness 会复利式降低未来 agent 失败率。",
+      "review_questions": [
+        "作者为什么说最可靠的方式是让 agent 自动知道自己错了？",
+        "AGENTS.md 适合解决哪类问题？",
+        "实际编程工具和提示文件之间是什么关系？"
+      ],
+      "blocks": [
+        {
+          "id": "harness-focus-1",
+          "type": "paragraph",
+          "text": "阅读重点：harness engineering 的对象不是模型参数，而是模型周围的工作环境。",
+          "note_zh": "它包括项目说明、命令、测试、截图、脚本和验证入口。目标是让 agent 在本地环境里形成更短的反馈环。",
+          "translation_zh": ""
+        },
+        {
+          "id": "harness-focus-2",
+          "type": "paragraph",
+          "text": "迁移提示：当 agent 重复犯同一种错时，不要只在对话里纠正；应该问能否把纠正固化到仓库或工具里。",
+          "note_zh": "这就是一次性人工提醒和长期 harness 改进之间的差别。",
+          "translation_zh": ""
+        }
+      ]
+    },
+    {
+      "id": "step-6-always-have-an-agent-running",
+      "level": 2,
+      "title": "Step 6: Always Have an Agent Running",
+      "summary_zh": "与 harness engineering 同时，作者给自己设定了一个目标：尽量总有一个 agent 在跑。他喜欢把这和较慢但更深思的模型结合起来。不过他也明确说，目前不会跑多个 agent，实际做到的时间比例也只有普通工作日的 10% 到 20%，并且只在确实有帮助的任务上这么做。",
+      "key_points": [
+        "always running 是目标，不是已经完全实现的状态。",
+        "作者偏向一个后台 agent，而不是多 agent 并发，因为这样更容易平衡深度手工工作和监督成本。",
+        "慢模型的价值在于可能给出更高质量结果，但需要接受更长等待时间。",
+        "保持 agent 运行的真正瓶颈，是持续产生高质量、可委派的任务流。"
+      ],
+      "why_it_matters": "这节把 agent 工作流的上限问题说清楚：不是只要打开更多 agent 就会更高效，还要有足够好的任务队列和监督方式。",
+      "review_questions": [
+        "作者为什么目前不想运行多个 agent？",
+        "慢而深思的模型适合什么样的后台任务？",
+        "持续保持 agent 运行的核心挑战是什么？"
+      ],
+      "blocks": [
+        {
+          "id": "always-focus-1",
+          "type": "paragraph",
+          "text": "阅读重点：这里的目标不是为了显得先进，而是逼自己寻找真正值得委派的任务。",
+          "note_zh": "作者也强调，不会为了运行 agent 而运行 agent；任务质量仍然是前提。",
+          "translation_zh": ""
+        },
+        {
+          "id": "always-focus-2",
+          "type": "paragraph",
+          "text": "实践提示：一个稳定后台 agent 可能比多个并发 agent 更适合个人工作流。",
+          "note_zh": "并发越多，监督、合并和上下文切换成本也越高。作者目前选择的是较低复杂度的平衡点。",
+          "translation_zh": ""
+        }
+      ]
+    },
+    {
+      "id": "today",
+      "level": 2,
+      "title": "Today",
+      "summary_zh": "结尾回到作者当前状态：他已经能从现代 AI 工具中获得实际成功，但仍保持现实、可被未来修正的观点。他不关心 AI 叙事是否最终成立，也不想说服所有人；他只是作为一个喜欢构建东西的软件工匠，分享自己如何导航这些工具。",
+      "key_points": [
+        "作者的立场是实用主义，不是信仰式支持或反对。",
+        "他承认 AI 领域变化很快，今天的判断以后可能显得天真。",
+        "他尊重别人因各种原因不用 AI 的选择。",
+        "这篇文章也是一篇关于如何采用新工具的文章，不只关于 AI。"
+      ],
+      "why_it_matters": "这一节防止读者把全文误读成通用处方。作者给的是个人路径和思考框架，不是所有人的唯一答案。",
+      "review_questions": [
+        "作者如何描述自己今天对 AI 工具的态度？",
+        "为什么他说未来可能会觉得现在的自己天真？",
+        "这篇文章除了 AI 之外，还能怎样理解？"
+      ],
+      "blocks": [
+        {
+          "id": "today-focus-1",
+          "type": "paragraph",
+          "text": "阅读重点：结尾的克制态度和开头呼应。",
+          "note_zh": "作者没有把个人效率提升包装成普遍义务，而是强调这是自己的采用方式，别人可以有不同选择。",
+          "translation_zh": ""
+        }
+      ]
+    },
+    {
+      "id": "footnotes",
+      "level": 2,
+      "title": "Footnotes",
+      "summary_zh": "脚注补充了几个重要限定：现代编码模型与 conversational models 的工具使用倾向不同；作者会因为模型进步持续修正判断；他对初级开发者的技能形成问题仍有担忧；他也说明自己与 AI 公司没有利益关系。",
+      "key_points": [
+        "模型训练目标会影响它是否倾向使用工具，不能把所有 LLM 界面混为一谈。",
+        "由于模型进步很快，对 agent 边界的判断需要定期更新。",
+        "技能形成问题尤其影响基础薄弱的 junior，需要单独严肃看待。",
+        "作者披露自己没有 AI 公司相关利益，有助于理解文章立场。"
+      ],
+      "why_it_matters": "脚注让文章的克制感更完整：作者既认可 agent 的价值，也主动标出判断的边界和风险。",
+      "review_questions": [
+        "为什么工具使用倾向会区分 coding models 和 conversational models？",
+        "作者为什么需要不断 revisiting priors？",
+        "技能形成问题在哪类人群中尤其值得担心？"
+      ],
+      "blocks": [
+        {
+          "id": "footnotes-focus-1",
+          "type": "paragraph",
+          "text": "阅读重点：脚注不是边角料，它们给全文的主张加上约束条件。",
+          "note_zh": "读完正文后回看脚注，可以看到作者哪些地方是在主动降低结论强度。",
+          "translation_zh": ""
+        }
+      ]
+    }
+  ],
+  "final_review_questions": [
+    "作者从 chatbot 转向 agent 的核心原因是什么？",
+    "“复现自己的工作”为什么比单纯看教程更能建立 agent 使用能力？",
+    "end-of-day agents 和 outsource the slam dunks 分别解决什么工作流问题？",
+    "harness engineering 和普通 prompt tweaking 有什么区别？",
+    "如果你要把这篇文章迁移到自己的工作流，最先应该改进的是任务筛选、验证工具，还是后台运行节奏？为什么？"
+  ]
+}

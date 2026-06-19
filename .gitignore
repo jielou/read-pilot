@@ -1,0 +1,9 @@
+.DS_Store
+.playwright-cli/
+.tmp/
+logs/
+output/
+library/
+__pycache__/
+*.pyc
+*.draft.json

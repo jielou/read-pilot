@@ -1,0 +1,4 @@
+interface:
+  display_name: "Read Pilot"
+  short_description: "太子伴读: turn long technical blogs into guided reading libraries"
+  default_prompt: "Use $read-pilot to convert this technical article URL into an offline guided reading page."
