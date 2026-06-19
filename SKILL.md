@@ -24,15 +24,16 @@ Read Pilot, 中文名“太子伴读”, creates a local reading library for tec
 4. Render the library and reusable live-page extension.
    - Run `scripts/render_library.py --library <library-dir> --article <article-json>`.
    - Run `scripts/render_chrome_extension.py --out <library-dir>/extension`.
+   - Run `scripts/ensure_server.py --library <library-dir> --port 8765` to start or reuse the local server automatically.
    - The HTML renderer creates a homepage and note detail pages for managing the library.
    - The Chrome extension is generic, installed once, and does nothing until the user opens the extension popup and clicks the activation button for the current tab.
    - After activation, the side panel syncs to the current article section while the user scrolls the live page.
    - Do not create one extension per article unless explicitly requested.
 5. Verify the output.
-   - Start the local server with `scripts/serve_library.py --library <library-dir> --port 8765`.
+   - Prefer `scripts/ensure_server.py --library <library-dir> --port 8765`; it checks whether the server is already running and starts it in the background if needed.
    - Check `http://127.0.0.1:8765/` for the library homepage.
    - Check `http://127.0.0.1:8765/api/notes?url=<encoded-source-url>` returns the article JSON.
-   - Load `<library-dir>/extension` once as an unpacked Chrome extension, open the extension popup on the source URL, click the activation button, and verify the side panel appears.
+   - The user only needs to load `<library-dir>/extension` once as an unpacked Chrome extension. After that, tell them to open the source URL, click the Read Pilot extension, and click the activation button.
 
 ## Reading Note Style
 
@@ -67,7 +68,8 @@ Use `references/article_json_schema.md` when creating or repairing article JSON.
 - Keep source JSON in `<library>/data/articles/`.
 - Generated pages live at `<library>/index.html` and `<library>/articles/<slug>.html`.
 - The reusable Chrome extension lives at `<library>/extension`.
-- The local notes API is served by `serve_library.py` on `http://127.0.0.1:8765` by default.
+- The local notes API is served on `http://127.0.0.1:8765` by default.
+- Use `scripts/ensure_server.py` after every render so the user does not need to manage `serve_library.py` manually.
 - Do not overwrite unrelated existing article JSON unless the user asks to regenerate it.
 - Slugs should be stable, lowercase, and URL-safe.
 
@@ -77,4 +79,5 @@ Use `references/article_json_schema.md` when creating or repairing article JSON.
 - `scripts/render_library.py`: render one or more article JSON files into a self-contained local HTML library.
 - `scripts/render_chrome_extension.py`: render a reusable no-API-key Chrome extension with a popup activation button; when activated for the current tab, it loads notes from the local library server, injects them into the original article page, and updates current-section notes while scrolling.
 - `scripts/serve_library.py`: serve the local library homepage and URL-matched notes API.
+- `scripts/ensure_server.py`: check whether the local server is already running for the requested library; if not, start `serve_library.py` in the background and report the local URL.
 - `references/article_json_schema.md`: field guide for article JSON.

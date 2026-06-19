@@ -4,6 +4,8 @@
 logs/
 output/
 library/
+.server/
 __pycache__/
 *.pyc
+*.pid
 *.draft.json

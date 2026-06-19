@@ -1,10 +1,15 @@
-# Read Pilot
-
-<img src="assets/logo.png" alt="Read Pilot logo" width="220">
+<div align="center">
+  <img src="assets/logo.png" alt="Read Pilot logo" width="220">
+  <h1>Read Pilot</h1>
+</div>
 
 Read Pilot, 中文名“太子伴读”, is a Codex skill and local tooling kit for turning long technical articles into guided Chinese reading notes.
 
 [中文 README](README.zh-CN.md)
+
+<p align="center">
+  <img src="demo/screenshots/screenshot.png" alt="Read Pilot guided reading library screenshot" width="860">
+</p>
 
 It produces:
 
@@ -27,7 +32,8 @@ The Codex skill name is `read-pilot`.
 │   ├── fetch_article.py             # Fetch URL metadata and section draft
 │   ├── render_library.py            # Render article JSON into local HTML pages
 │   ├── render_chrome_extension.py   # Build the reusable Chrome extension
-│   └── serve_library.py             # Serve pages and URL-matched notes API
+│   ├── serve_library.py             # Serve pages and URL-matched notes API
+│   └── ensure_server.py             # Start or reuse the local server
 └── demo/articles/                   # One checked-in demo article JSON
 ```
 
@@ -77,10 +83,10 @@ python3 scripts/render_library.py --library library
 python3 scripts/render_chrome_extension.py --out library/extension
 ```
 
-Serve locally:
+Start or reuse the local server:
 
 ```bash
-python3 scripts/serve_library.py --library library --port 8765
+python3 scripts/ensure_server.py --library library --port 8765
 ```
 
 Open:
@@ -108,7 +114,7 @@ Render it into a temporary local library:
 ```bash
 python3 scripts/render_library.py --library .tmp/demo-library --article demo/articles/my-ai-adoption-journey.json
 python3 scripts/render_chrome_extension.py --out .tmp/demo-library/extension
-python3 scripts/serve_library.py --library .tmp/demo-library --port 8765
+python3 scripts/ensure_server.py --library .tmp/demo-library --port 8765
 ```
 
 Then visit:

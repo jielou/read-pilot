@@ -1,10 +1,15 @@
-# Read Pilot（太子伴读）
-
-<img src="assets/logo.png" alt="Read Pilot logo" width="220">
+<div align="center">
+  <img src="assets/logo.png" alt="Read Pilot logo" width="220">
+  <h1>Read Pilot（太子伴读）</h1>
+</div>
 
 Read Pilot（太子伴读）是一个 Codex skill 和本地工具集，用来把长篇技术文章转换成中文伴读材料。
 
 [English README](README.md)
+
+<p align="center">
+  <img src="demo/screenshots/screenshot.png" alt="Read Pilot 伴读库截图" width="860">
+</p>
 
 它会生成：
 
@@ -27,7 +32,8 @@ Codex skill 名称是 `read-pilot`。
 │   ├── fetch_article.py             # 抓取 URL 元信息和章节草稿
 │   ├── render_library.py            # 把文章 JSON 渲染成本地 HTML 阅读库
 │   ├── render_chrome_extension.py   # 生成可复用 Chrome extension
-│   └── serve_library.py             # 启动本地页面和 notes API
+│   ├── serve_library.py             # 启动本地页面和 notes API
+│   └── ensure_server.py             # 自动启动或复用本地 server
 └── demo/articles/                   # 一个示例文章 JSON
 ```
 
@@ -77,10 +83,10 @@ python3 scripts/render_library.py --library library
 python3 scripts/render_chrome_extension.py --out library/extension
 ```
 
-启动本地服务：
+自动启动或复用本地服务：
 
 ```bash
-python3 scripts/serve_library.py --library library --port 8765
+python3 scripts/ensure_server.py --library library --port 8765
 ```
 
 打开：
@@ -108,7 +114,7 @@ demo/articles/my-ai-adoption-journey.json
 ```bash
 python3 scripts/render_library.py --library .tmp/demo-library --article demo/articles/my-ai-adoption-journey.json
 python3 scripts/render_chrome_extension.py --out .tmp/demo-library/extension
-python3 scripts/serve_library.py --library .tmp/demo-library --port 8765
+python3 scripts/ensure_server.py --library .tmp/demo-library --port 8765
 ```
 
 然后访问：

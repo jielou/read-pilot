@@ -44,6 +44,9 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
+        if parsed.path == "/api/health":
+            self.handle_health()
+            return
         if parsed.path == "/api/notes":
             self.handle_notes(parsed.query)
             return
@@ -51,6 +54,14 @@ class Handler(SimpleHTTPRequestHandler):
             self.handle_articles()
             return
         super().do_GET()
+
+    def handle_health(self) -> None:
+        self.write_json(
+            {
+                "status": "ok",
+                "library": str(self.library),
+            }
+        )
 
     def handle_articles(self) -> None:
         articles = load_articles(self.library)
