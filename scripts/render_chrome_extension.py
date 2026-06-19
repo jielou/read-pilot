@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 from pathlib import Path
 
 
@@ -14,6 +15,7 @@ CONTENT_JS = r"""
   document.getElementById('reading-companion-launcher')?.remove();
 
   const API_BASE = 'http://127.0.0.1:8765';
+  const logoUrl = chrome.runtime.getURL('logo.png');
   const currentUrl = window.location.href.split('#')[0];
 
   function escapeText(value) {
@@ -48,9 +50,12 @@ CONTENT_JS = r"""
   function shell(content) {
     return `
       <div class="rc-header">
-        <div>
-          <div class="rc-kicker">Read Pilot</div>
-          <div class="rc-title">太子伴读</div>
+        <div class="rc-brand">
+          <img class="rc-logo" src="${logoUrl}" alt="" aria-hidden="true">
+          <div>
+            <div class="rc-kicker">Read Pilot</div>
+            <div class="rc-title">太子伴读</div>
+          </div>
         </div>
         <button class="rc-toggle" type="button" aria-label="Toggle panel">×</button>
       </div>
@@ -178,9 +183,12 @@ CONTENT_JS = r"""
   function renderArticle(article) {
     return `
       <div class="rc-header">
-        <div>
-          <div class="rc-kicker">Read Pilot</div>
-          <div class="rc-title">${escapeText(article.title)}</div>
+        <div class="rc-brand">
+          <img class="rc-logo" src="${logoUrl}" alt="" aria-hidden="true">
+          <div>
+            <div class="rc-kicker">Read Pilot</div>
+            <div class="rc-title">${escapeText(article.title)}</div>
+          </div>
         </div>
         <button class="rc-toggle" type="button" aria-label="Toggle panel">×</button>
       </div>
@@ -338,7 +346,19 @@ POPUP_HTML = r"""
     h1 {
       font-size: 16px;
       line-height: 1.25;
-      margin: 0 0 8px;
+      margin: 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 10px;
+    }
+    .brand img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+      flex: 0 0 auto;
     }
     p {
       margin: 0 0 12px;
@@ -367,7 +387,10 @@ POPUP_HTML = r"""
   </style>
 </head>
 <body>
-  <h1>Read Pilot</h1>
+  <div class="brand">
+    <img src="logo.png" alt="" aria-hidden="true">
+    <h1>Read Pilot</h1>
+  </div>
   <p>Activate notes for the current tab only.</p>
   <button id="activate" type="button">Show Notes</button>
   <div id="status"></div>
@@ -446,6 +469,18 @@ html.reading-companion-open #reading-companion-root {
   gap: 12px;
   padding: 16px;
   border-bottom: 1px solid #d8d4cb;
+}
+.rc-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+.rc-logo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  flex: 0 0 auto;
 }
 .rc-kicker {
   color: #0f766e;
@@ -637,6 +672,7 @@ def main() -> int:
 
     out = Path(args.out).expanduser()
     out.mkdir(parents=True, exist_ok=True)
+    asset_dir = Path(__file__).resolve().parents[1] / "assets"
 
     manifest = {
         "manifest_version": 3,
@@ -645,10 +681,32 @@ def main() -> int:
         "description": "Shows local guided reading notes beside matching technical blog pages.",
         "permissions": ["activeTab", "scripting"],
         "host_permissions": [f"http://127.0.0.1:{args.api_port}/*"],
-        "action": {"default_popup": "popup.html"},
+        "icons": {
+            "16": "icon-16.png",
+            "32": "icon-32.png",
+            "48": "icon-48.png",
+            "128": "icon-128.png",
+        },
+        "action": {
+            "default_popup": "popup.html",
+            "default_icon": {
+                "16": "icon-16.png",
+                "32": "icon-32.png",
+                "48": "icon-48.png",
+                "128": "icon-128.png",
+            },
+        },
+        "web_accessible_resources": [
+            {
+                "resources": ["logo.png"],
+                "matches": ["<all_urls>"],
+            }
+        ],
     }
 
     content_js = CONTENT_JS.replace("http://127.0.0.1:8765", f"http://127.0.0.1:{args.api_port}")
+    for asset_name in ("logo.png", "icon-16.png", "icon-32.png", "icon-48.png", "icon-128.png"):
+        shutil.copyfile(asset_dir / asset_name, out / asset_name)
     (out / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     (out / "content.js").write_text(content_js.lstrip(), encoding="utf-8")
     (out / "popup.html").write_text(POPUP_HTML.lstrip(), encoding="utf-8")

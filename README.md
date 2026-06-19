@@ -1,6 +1,10 @@
 # Read Pilot
 
+<img src="assets/logo.png" alt="Read Pilot logo" width="220">
+
 Read Pilot, 中文名“太子伴读”, is a Codex skill and local tooling kit for turning long technical articles into guided Chinese reading notes.
+
+[中文 README](README.zh-CN.md)
 
 It produces:
 
@@ -16,6 +20,7 @@ The Codex skill name is `read-pilot`.
 ```text
 .
 ├── SKILL.md                         # Codex skill instructions
+├── assets/                          # Logo and Chrome extension icons
 ├── agents/openai.yaml               # Skill UI metadata
 ├── references/article_json_schema.md # Article JSON field guide
 ├── scripts/
